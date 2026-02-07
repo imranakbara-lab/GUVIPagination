@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Pagination DOM Task</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+
+    table {
+      margin: 20px auto;
+      border-collapse: collapse;
+      width: 60%;
+    }
+
+    th, td {
+      border: 1px solid #333;
+      padding: 8px;
+    }
+
+    .pagination button {
+      margin: 5px;
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+
+    .active {
+      background-color: blue;
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h2>Pagination using DOM</h2>
+
+  <!-- Table container -->
+  <div id="table-container"></div>
+
+  <!-- Pagination buttons -->
+  <div class="pagination" id="pagination"></div>
+
+  <script>
+    const url = "https://raw.githubusercontent.com/Rajavasanthan/jsondata/master/pagenation.json";
+
+    let data = [];
+    let currentPage = 1;
+    let rowsPerPage = 5;
+
+       fetch(url)
+      .then(response => response.json())
+      .then(jsonData => {
+        data = jsonData;
+        displayTable(currentPage);
+        setupPagination();
+      });
+
+    // Display table data
+    function displayTable(page) {
+      const container = document.getElementById("table-container");
+      container.innerHTML = "";
+
+      const table = document.createElement("table");
+
+      // Table head
+      const thead = document.createElement("thead");
+      const headRow = document.createElement("tr");
+
+      ["ID", "Name", "Email"].forEach(text => {
+        const th = document.createElement("th");
+        th.textContent = text;
+        headRow.appendChild(th);
+      });
+
+      thead.appendChild(headRow);
+      table.appendChild(thead);
+
+      // Table body
+      const tbody = document.createElement("tbody");
+
+      let start = (page - 1) * rowsPerPage;
+      let end = start + rowsPerPage;
+      let pageData = data.slice(start, end);
+
+      pageData.forEach(item => {
+        const row = document.createElement("tr");
+
+        const id = document.createElement("td");
+        id.textContent = item.id;
+
+        const name = document.createElement("td");
+        name.textContent = item.name;
+
+        const email = document.createElement("td");
+        email.textContent = item.email;
+
+        row.append(id, name, email);
+        tbody.appendChild(row);
+      });
+
+      table.appendChild(tbody);
+      container.appendChild(table);
+    }
+
+    // Pagination buttons
+    function setupPagination() {
+      const pagination = document.getElementById("pagination");
+      pagination.innerHTML = "";
+
+      let pageCount = Math.ceil(data.length / rowsPerPage);
+
+      for (let i = 1; i <= pageCount; i++) {
+        const btn = document.createElement("button");
+        btn.textContent = i;
+
+        if (i === currentPage) {
+          btn.classList.add("active");
+        }
+
+        btn.addEventListener("click", () => {
+          currentPage = i;
+          displayTable(currentPage);
+          setupPagination();
+        });
+
+        pagination.appendChild(btn);
+      }
+    }
+  </script>
+
+   <script src="https://app.zenclass.in/suite/bundle.js"></script>
+
+</body>
+</html>
